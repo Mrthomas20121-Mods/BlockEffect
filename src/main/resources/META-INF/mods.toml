@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="MIT License"
+issueTrackerURL="https://github.com/Mrthomas20121/FoodUpdate/issues"
+
+[[mods]]
+modId="block_effect"
+version="${version}"
+displayName="Food Update"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/block_effect"
+#logoFile="tinkers_reforged_logo.png"
+authors="Mrthomas20121"
+description='''
+Blocks give effect on mining
+'''
+
+[[dependencies.block_effect]]
+    modId="forge"
+    mandatory=true
+    versionRange="[36,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.block_effect]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="${minecraft_range}"
+    ordering="NONE"
+    side="BOTH"
