@@ -17,6 +17,7 @@ public class BlockEffect {
 	public static final Logger LOGGER = LogManager.getLogger();
 
 	public BlockEffect() {
-		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BlockConfig.config);
+		BlockConfig.createJson();
+		BlockConfig.readJson();
 	}
 }
