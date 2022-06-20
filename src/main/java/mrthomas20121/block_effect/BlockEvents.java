@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,8 +22,8 @@ public class BlockEvents {
         Block block = event.getState().getBlock();
         ResourceLocation registryName = block.getRegistryName();
         if(registryName != null && !event.isCanceled() && !event.getPlayer().isCreative()) {
-            if(!BlockConfig.config.isEmpty()) {
-                for(Map.Entry<String, EffectWrapper> entry: BlockConfig.config.entrySet()) {
+            if(!EffectAdapter.INSTANCE.potionEffects.isEmpty()) {
+                for(Map.Entry<String, EffectWrapper> entry: EffectAdapter.INSTANCE.potionEffects.entrySet()) {
                     EffectWrapper effectWrapper = entry.getValue();
                     ResourceLocation blockName = new ResourceLocation(entry.getKey());
                     if(registryName.equals(blockName)) {
@@ -31,5 +32,10 @@ public class BlockEvents {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onUtil(AddReloadListenerEvent event) {
+        event.addListener(EffectAdapter.INSTANCE);
     }
 }
