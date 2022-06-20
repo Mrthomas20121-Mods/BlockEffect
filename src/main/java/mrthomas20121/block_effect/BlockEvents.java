@@ -19,7 +19,7 @@ public class BlockEvents {
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void blockBreak(BlockEvent.BreakEvent event) {
         Block block = event.getState().getBlock();
-        ResourceLocation registryName = block.getRegistryName();
+        ResourceLocation registryName = ForgeRegistries.BLOCKS.getKey(block);
         if(registryName != null && !event.isCanceled() && !event.getPlayer().isCreative()) {
             if(!EffectAdapter.potionEffects.isEmpty()) {
                 for(Map.Entry<String, EffectWrapper> entry: EffectAdapter.potionEffects.entrySet()) {
