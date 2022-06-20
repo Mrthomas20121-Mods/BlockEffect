@@ -1,10 +1,7 @@
 package mrthomas20121.block_effect;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -20,16 +17,14 @@ public class EffectAdapter extends SimpleJsonResourceReloadListener {
     private static final Type type = new TypeToken<Map<String, EffectWrapper>>() {}.getType();
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(type, new EffectJsonDeserializer()).serializeNulls().create();
 
-    public Map<String, EffectWrapper> potionEffects = new HashMap<>();
+    public static Map<String, EffectWrapper> potionEffects = new HashMap<>();
 
     public static final EffectAdapter INSTANCE = new EffectAdapter();
 
     public EffectAdapter() {
         super(gson, "effects");
     }
-
-
-
+    
     @Override
     protected void apply(@Nonnull Map<ResourceLocation, JsonElement> map, @Nonnull ResourceManager manager, @Nonnull ProfilerFiller profiler) {
         map.forEach((loc, elem) -> {

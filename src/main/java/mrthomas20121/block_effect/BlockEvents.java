@@ -21,8 +21,8 @@ public class BlockEvents {
         Block block = event.getState().getBlock();
         ResourceLocation registryName = block.getRegistryName();
         if(registryName != null && !event.isCanceled() && !event.getPlayer().isCreative()) {
-            if(!EffectAdapter.INSTANCE.potionEffects.isEmpty()) {
-                for(Map.Entry<String, EffectWrapper> entry: EffectAdapter.INSTANCE.potionEffects.entrySet()) {
+            if(!EffectAdapter.potionEffects.isEmpty()) {
+                for(Map.Entry<String, EffectWrapper> entry: EffectAdapter.potionEffects.entrySet()) {
                     EffectWrapper effectWrapper = entry.getValue();
                     ResourceLocation blockName = new ResourceLocation(entry.getKey());
                     if(registryName.equals(blockName)) {
