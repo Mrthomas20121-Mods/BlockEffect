@@ -1,29 +1,14 @@
 modLoader="javafml"
 loaderVersion="[36,)"
 license="MIT License"
-issueTrackerURL="https://github.com/Mrthomas20121/FoodUpdate/issues"
+issueTrackerURL="https://github.com/Mrthomas20121-Mods/BlockEffect/issues"
 
 [[mods]]
 modId="block_effect"
-version="${version}"
+version="1.1.0"
 displayName="Food Update"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/block_effect"
-#logoFile="tinkers_reforged_logo.png"
 authors="Mrthomas20121"
 description='''
-Blocks give effect on mining
+Add effects to the player on block break.
 '''
-
-[[dependencies.block_effect]]
-    modId="forge"
-    mandatory=true
-    versionRange="[36,)"
-    ordering="NONE"
-    side="BOTH"
-
-[[dependencies.block_effect]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="${minecraft_range}"
-    ordering="NONE"
-    side="BOTH"

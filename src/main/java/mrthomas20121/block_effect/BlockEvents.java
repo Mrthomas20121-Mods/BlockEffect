@@ -1,9 +1,8 @@
 package mrthomas20121.block_effect;
 
-import net.minecraft.block.Block;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -27,7 +26,7 @@ public class BlockEvents {
                     EffectWrapper effectWrapper = entry.getValue();
                     ResourceLocation blockName = new ResourceLocation(entry.getKey());
                     if(registryName.equals(blockName)) {
-                        event.getPlayer().addEffect(new EffectInstance(Objects.requireNonNull(ForgeRegistries.POTIONS.getValue(effectWrapper.getPotionRegistryName())), effectWrapper.getDuration(), effectWrapper.getStrength()));
+                        event.getPlayer().addEffect(new MobEffectInstance(Objects.requireNonNull(ForgeRegistries.MOB_EFFECTS.getValue(effectWrapper.getPotionRegistryName())), effectWrapper.getDuration(), effectWrapper.getStrength()));
                     }
                 }
             }

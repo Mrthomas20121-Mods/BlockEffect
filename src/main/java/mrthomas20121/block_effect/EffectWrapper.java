@@ -1,6 +1,6 @@
 package mrthomas20121.block_effect;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class EffectWrapper {
 
