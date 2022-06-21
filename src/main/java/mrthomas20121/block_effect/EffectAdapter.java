@@ -1,23 +1,24 @@
 package mrthomas20121.block_effect;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
-import java.lang.reflect.Type;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class EffectAdapter extends SimpleJsonResourceReloadListener {
 
-    private static final Type type = new TypeToken<Map<String, EffectWrapper>>() {}.getType();
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(type, new EffectJsonDeserializer()).serializeNulls().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
-    public static Map<String, EffectWrapper> potionEffects = new HashMap<>();
+    public static List<EffectData> potionEffects = new ArrayList<>();
 
     public static final EffectAdapter INSTANCE = new EffectAdapter();
 
@@ -30,21 +31,35 @@ public class EffectAdapter extends SimpleJsonResourceReloadListener {
         map.forEach((loc, elem) -> {
             JsonObject object = elem.getAsJsonObject();
 
-            if(!object.has("block")) {
-                BlockEffect.LOGGER.warn("Invalid Block effect {}, missing block property.", loc.toString());
+            boolean enabled = object.get("enabled").getAsBoolean();
+            if(!enabled) {
+                BlockEffect.LOGGER.warn("Skipped {} because it is not enabled", loc.toString());
                 return;
             }
-            if(object.has("enabled")) {
-                boolean enabled = object.get("enabled").getAsBoolean();
-                if(!enabled) {
-                    BlockEffect.LOGGER.warn("Disabled {}", loc.toString());
+
+            List<MobEffectInstance> effects = new ArrayList<>();
+            for(JsonElement element: object.get("effects").getAsJsonArray()) {
+                JsonObject obj = element.getAsJsonObject();
+                ResourceLocation name = new ResourceLocation(obj.get("name").getAsString());
+                int amplifier = obj.get("amplifier").getAsInt();
+                int duration = obj.get("duration").getAsInt();
+                MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue(name);
+                if(effect != null) {
+                    effects.add(new MobEffectInstance(effect, duration, amplifier));
+                }
+                else {
+                    BlockEffect.LOGGER.warn("Effect {} is invalid! please provide a valid name", name.toString());
                     return;
                 }
             }
-
-            String block = object.get("block").getAsString();
-            EffectWrapper wrapper = gson.fromJson(object.get("effect"), EffectWrapper.class);
-            potionEffects.put(block, wrapper);
+            if(object.has("tag")) {
+                String tag = object.get("tag").getAsString();
+                potionEffects.add(new EffectData(effects, tag, true));
+            }
+            else {
+                String block = object.get("block").getAsString();
+                potionEffects.add(new EffectData(effects, block));
+            }
         });
     }
 }
