@@ -1,50 +1,121 @@
 package mrthomas20121.block_effect;
 
-import net.minecraft.resources.ResourceLocation;
+import mrthomas20121.block_effect.data.EffectData;
+import mrthomas20121.block_effect.data.Action;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-@Mod.EventBusSubscriber(modid = BlockEffect.mod_id)
 public class BlockEvents {
 
+    public BlockEvents() {}
+
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void blockBreak(BlockEvent.BreakEvent event) {
-        Block block = event.getState().getBlock();
-        ResourceLocation registryName = ForgeRegistries.BLOCKS.getKey(block);
-        if(registryName != null && !event.isCanceled() && !event.getPlayer().isCreative()) {
-            if(!EffectAdapter.potionEffects.isEmpty()) {
-                for(EffectData effectData: EffectAdapter.potionEffects) {
-                    List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
-                    if(effectInstanceList.isEmpty()) {
-                        return;
-                    }
-                    else {
-                        if(effectData.isTag()) {
-                            if(effectData.tagContainBlock(block)) {
+    public void blockBreak(BlockEvent.BreakEvent event) {
+        final List<EffectData> blockBreakEffects = EffectAdapter.block_break_effects;
+        if(!blockBreakEffects.isEmpty()) {
+            Block block = event.getState().getBlock();
+            if(!event.isCanceled() && !event.getPlayer().isCreative()) {
+                if(!blockBreakEffects.isEmpty()) {
+                    for(EffectData effectData: blockBreakEffects) {
+                        List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
+                        if(!effectInstanceList.isEmpty()) {
+                            if(effectData.getMatch().match(block)) {
                                 Player player = event.getPlayer();
-                                for(MobEffectInstance effect: effectInstanceList) {
-                                    player.addEffect(effect);
+                                if(effectData.getMatch().match(block)) {
+                                    effectInstanceList.forEach(player::addEffect);
                                 }
                             }
                         }
-                        else {
-                            ResourceLocation blockName = new ResourceLocation(effectData.getName());
-                            if(registryName.equals(blockName)) {
-                                Player player = event.getPlayer();
-                                for(MobEffectInstance effect: effectInstanceList) {
-                                    player.addEffect(effect);
+
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        final List<EffectData> blockBreakEffects = EffectAdapter.block_right_click_effects;
+        if(!blockBreakEffects.isEmpty()) {
+            Block block = event.getEntity().level.getBlockState(event.getPos()).getBlock();
+            if(!event.isCanceled() && !event.getEntity().isCreative()) {
+                if(!blockBreakEffects.isEmpty()) {
+                    for(EffectData effectData: blockBreakEffects) {
+                        List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
+                        if(!effectInstanceList.isEmpty()) {
+                            if(effectData.getMatch().match(block)) {
+                                Player player = event.getEntity();
+                                if(effectData.getMatch().match(block)) {
+                                    effectInstanceList.forEach(mobEffectInstance -> {
+                                        if(!player.hasEffect(mobEffectInstance.getEffect())) {
+                                            player.addEffect(mobEffectInstance);
+                                        }
+                                    });
                                 }
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void isOnBlock(TickEvent.PlayerTickEvent event) {
+        final List<EffectData> isOnBlockEffects = EffectAdapter.is_on_block_effects;
+        if(!isOnBlockEffects.isEmpty()) {
+            if(!event.isCanceled() && !event.player.isCreative()) {
+                if(!isOnBlockEffects.isEmpty()) {
+                    for(EffectData effectData: isOnBlockEffects) {
+                        List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
+                        if(!effectInstanceList.isEmpty()) {
+                            Player player = event.player;
+                            BlockPos pos = player.blockPosition();
+                            Block block = player.level.getBlockState(pos).getBlock();
+                            if(effectData.getMatch().match(block)) {
+                                effectInstanceList.forEach(mobEffectInstance -> {
+                                    if(!player.hasEffect(mobEffectInstance.getEffect())) {
+                                        player.addEffect(mobEffectInstance);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void blockPlace(BlockEvent.EntityPlaceEvent event) {
+        final List<EffectData> blockPlaceEffects = EffectAdapter.block_place_effects;
+        if(!blockPlaceEffects.isEmpty()) {
+            if(!event.isCanceled() && event.getEntity() instanceof Player player) {
+                if(player.isCreative()) {
+                    return;
+                }
+                if(!blockPlaceEffects.isEmpty()) {
+                    for(EffectData effectData: blockPlaceEffects) {
+                        List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
+                        if(!effectInstanceList.isEmpty()) {
+                            if(effectData.getMatch().match(event.getPlacedBlock().getBlock())) {
+                                effectInstanceList.forEach(mobEffectInstance -> {
+                                    if(!player.hasEffect(mobEffectInstance.getEffect())) {
+                                        player.addEffect(mobEffectInstance);
+                                    }
+                                });
                             }
                         }
                     }
@@ -54,7 +125,7 @@ public class BlockEvents {
     }
 
     @SubscribeEvent
-    public static void onUtil(AddReloadListenerEvent event) {
+    public void listenerEvent(AddReloadListenerEvent event) {
         event.addListener(EffectAdapter.INSTANCE);
     }
 }

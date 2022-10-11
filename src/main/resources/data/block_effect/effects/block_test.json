@@ -1,0 +1,16 @@
+{
+    "enabled": true,
+    "action": "block_effect:block_break",
+    "match": {
+        "type": "block_effect:block_tag",
+        "tag": "minecraft:sand"
+    },
+    "potion_effects": [
+        {
+            "effect": "minecraft:speed",
+            "duration": 200,
+            "level": 1,
+            "particle": true
+        }
+    ]
+}

@@ -5,10 +5,22 @@ issueTrackerURL="https://github.com/Mrthomas20121-Mods/BlockEffect/issues"
 
 [[mods]]
 modId="block_effect"
-version="1.1.1"
+version="1.1.2"
 displayName="Food Update"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/block_effect"
 authors="Mrthomas20121"
 description='''
-Add effects to the player on block break.
+Add effects to the player when interacting with blocks.
 '''
+
+[[dependencies.block_effect]] #optional
+    # the modid of the dependency
+    modId="forge" #mandatory
+    # Does this dependency have to exist - if not, ordering below must be specified
+    mandatory=true #mandatory
+    # The version range of the dependency
+    versionRange="[43,)" #mandatory
+    # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
+    ordering="NONE"
+    # Side this dependency is applied on - BOTH, CLIENT or SERVER
+    side="BOTH"

@@ -1,0 +1,19 @@
+{
+    "enabled": true,
+    "action": [
+        "block_effect:block_break",
+        "block_effect:block_place"
+    ],
+    "match": {
+        "type": "block_effect:block",
+        "block": "minecraft:dirt"
+    },
+    "potion_effects": [
+        {
+            "effect": "minecraft:slowness",
+            "duration": 200,
+            "level": 0,
+            "particle": false
+        }
+    ]
+}
