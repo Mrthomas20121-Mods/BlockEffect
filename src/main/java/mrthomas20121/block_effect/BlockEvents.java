@@ -3,6 +3,7 @@ package mrthomas20121.block_effect;
 import mrthomas20121.block_effect.data.EffectData;
 import mrthomas20121.block_effect.data.Action;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
@@ -25,15 +26,19 @@ public class BlockEvents {
         final List<EffectData> blockBreakEffects = EffectAdapter.block_break_effects;
         if(!blockBreakEffects.isEmpty()) {
             Block block = event.getState().getBlock();
-            if(!event.isCanceled() && !event.getPlayer().isCreative()) {
+            if(!event.isCanceled() && event.getPlayer() instanceof ServerPlayer serverPlayer && !serverPlayer.isCreative()) {
+                if(event.getPlayer().level.isClientSide) {
+                    return;
+                }
                 for(EffectData effectData: blockBreakEffects) {
-                    List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
-                    if(!effectInstanceList.isEmpty()) {
-                        if(effectData.getMatch().match(block)) {
-                            Player player = event.getPlayer();
-                            if(effectData.getMatch().match(block)) {
-                                effectInstanceList.forEach(player::addEffect);
-                            }
+                    if(effectData.getMatch().match(block)) {
+                        List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
+                        if(!effectInstanceList.isEmpty()) {
+                            effectInstanceList.forEach(mobEffectInstance -> {
+                                if(!serverPlayer.hasEffect(mobEffectInstance.getEffect())) {
+                                    serverPlayer.addEffect(mobEffectInstance);
+                                }
+                            });
                         }
                     }
                 }
@@ -46,19 +51,19 @@ public class BlockEvents {
         final List<EffectData> blockBreakEffects = EffectAdapter.block_right_click_effects;
         if(!blockBreakEffects.isEmpty()) {
             Block block = event.getEntity().level.getBlockState(event.getPos()).getBlock();
-            if(!event.isCanceled() && !event.getEntity().isCreative()) {
+            if(!event.isCanceled() && event.getEntity() instanceof ServerPlayer serverPlayer && !serverPlayer.isCreative()) {
+                if(event.getEntity().level.isClientSide) {
+                    return;
+                }
                 for(EffectData effectData: blockBreakEffects) {
-                    List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
-                    if(!effectInstanceList.isEmpty()) {
-                        if(effectData.getMatch().match(block)) {
-                            Player player = event.getEntity();
-                            if(effectData.getMatch().match(block)) {
-                                effectInstanceList.forEach(mobEffectInstance -> {
-                                    if(!player.hasEffect(mobEffectInstance.getEffect())) {
-                                        player.addEffect(mobEffectInstance);
-                                    }
-                                });
-                            }
+                    if(effectData.getMatch().match(block)) {
+                        List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
+                        if(!effectInstanceList.isEmpty()) {
+                            effectInstanceList.forEach(mobEffectInstance -> {
+                                if(!serverPlayer.hasEffect(mobEffectInstance.getEffect())) {
+                                    serverPlayer.addEffect(mobEffectInstance);
+                                }
+                            });
                         }
                     }
                 }
@@ -70,17 +75,19 @@ public class BlockEvents {
     public void isOnBlock(TickEvent.PlayerTickEvent event) {
         final List<EffectData> isOnBlockEffects = EffectAdapter.is_on_block_effects;
         if(!isOnBlockEffects.isEmpty()) {
-            if(!event.isCanceled() && !event.player.isCreative()) {
+            if(!event.isCanceled() && event.player instanceof ServerPlayer serverPlayer && !serverPlayer.isCreative()) {
+                if(event.player.level.isClientSide) {
+                    return;
+                }
                 for(EffectData effectData: isOnBlockEffects) {
-                    List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
-                    if(!effectInstanceList.isEmpty()) {
-                        Player player = event.player;
-                        BlockPos pos = player.blockPosition();
-                        Block block = player.level.getBlockState(pos).getBlock();
-                        if(effectData.getMatch().match(block)) {
+                    BlockPos pos = serverPlayer.blockPosition();
+                    Block block = serverPlayer.level.getBlockState(pos).getBlock();
+                    if(effectData.getMatch().match(block)) {
+                        List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
+                        if(!effectInstanceList.isEmpty()) {
                             effectInstanceList.forEach(mobEffectInstance -> {
-                                if(!player.hasEffect(mobEffectInstance.getEffect())) {
-                                    player.addEffect(mobEffectInstance);
+                                if(!serverPlayer.hasEffect(mobEffectInstance.getEffect())) {
+                                    serverPlayer.addEffect(mobEffectInstance);
                                 }
                             });
                         }
@@ -94,18 +101,20 @@ public class BlockEvents {
     public void blockPlace(BlockEvent.EntityPlaceEvent event) {
         final List<EffectData> blockPlaceEffects = EffectAdapter.block_place_effects;
         if(!blockPlaceEffects.isEmpty()) {
-            if(!event.isCanceled() && event.getEntity() instanceof Player player) {
-                if(!player.isCreative()) {
-                    for(EffectData effectData: blockPlaceEffects) {
+            if(!event.isCanceled() && event.getEntity() instanceof ServerPlayer serverPlayer && !serverPlayer.isCreative()) {
+                if(event.getEntity().level.isClientSide) {
+                    return;
+                }
+                for(EffectData effectData: blockPlaceEffects) {
+                    Block block = event.getState().getBlock();
+                    if(effectData.getMatch().match(block)) {
                         List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
                         if(!effectInstanceList.isEmpty()) {
-                            if(effectData.getMatch().match(event.getPlacedBlock().getBlock())) {
-                                effectInstanceList.forEach(mobEffectInstance -> {
-                                    if(!player.hasEffect(mobEffectInstance.getEffect())) {
-                                        player.addEffect(mobEffectInstance);
-                                    }
-                                });
-                            }
+                            effectInstanceList.forEach(mobEffectInstance -> {
+                                if(!serverPlayer.hasEffect(mobEffectInstance.getEffect())) {
+                                    serverPlayer.addEffect(mobEffectInstance);
+                                }
+                            });
                         }
                     }
                 }

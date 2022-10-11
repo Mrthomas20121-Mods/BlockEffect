@@ -3,6 +3,7 @@ package mrthomas20121.block_effect;
 import com.google.gson.*;
 import mrthomas20121.block_effect.data.EffectData;
 import mrthomas20121.block_effect.data.Action;
+import mrthomas20121.block_effect.data.JsonEffect;
 import mrthomas20121.block_effect.data.block.Match;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -46,7 +47,7 @@ public class EffectAdapter extends SimpleJsonResourceReloadListener {
                 return;
             }
 
-            List<MobEffectInstance> effects = new ArrayList<>();
+            List<JsonEffect> effects = new ArrayList<>();
             for(JsonElement element: object.get("potion_effects").getAsJsonArray()) {
                 JsonObject obj = element.getAsJsonObject();
                 ResourceLocation name = new ResourceLocation(obj.get("effect").getAsString());
@@ -58,13 +59,8 @@ public class EffectAdapter extends SimpleJsonResourceReloadListener {
                     hasParticle = obj.get("particle").getAsBoolean();
                 }
 
-                MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue(name);
-                if(effect != null) {
-                    effects.add(new MobEffectInstance(effect, duration, amplifier, false, hasParticle));
-                }
-                else {
-                    BlockEffect.LOGGER.warn("Effect {} is invalid! please provide a valid name", name.toString());
-                    return;
+                if(ForgeRegistries.MOB_EFFECTS.containsKey(name)) {
+                    effects.add(new JsonEffect(name, duration, amplifier, hasParticle));
                 }
             }
             Match match = Action.BlockType.getMatchFromJson(object.getAsJsonObject("match"));
