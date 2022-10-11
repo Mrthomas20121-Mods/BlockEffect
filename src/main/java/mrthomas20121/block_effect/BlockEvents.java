@@ -26,18 +26,15 @@ public class BlockEvents {
         if(!blockBreakEffects.isEmpty()) {
             Block block = event.getState().getBlock();
             if(!event.isCanceled() && !event.getPlayer().isCreative()) {
-                if(!blockBreakEffects.isEmpty()) {
-                    for(EffectData effectData: blockBreakEffects) {
-                        List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
-                        if(!effectInstanceList.isEmpty()) {
+                for(EffectData effectData: blockBreakEffects) {
+                    List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
+                    if(!effectInstanceList.isEmpty()) {
+                        if(effectData.getMatch().match(block)) {
+                            Player player = event.getPlayer();
                             if(effectData.getMatch().match(block)) {
-                                Player player = event.getPlayer();
-                                if(effectData.getMatch().match(block)) {
-                                    effectInstanceList.forEach(player::addEffect);
-                                }
+                                effectInstanceList.forEach(player::addEffect);
                             }
                         }
-
                     }
                 }
             }
@@ -50,40 +47,11 @@ public class BlockEvents {
         if(!blockBreakEffects.isEmpty()) {
             Block block = event.getEntity().level.getBlockState(event.getPos()).getBlock();
             if(!event.isCanceled() && !event.getEntity().isCreative()) {
-                if(!blockBreakEffects.isEmpty()) {
-                    for(EffectData effectData: blockBreakEffects) {
-                        List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
-                        if(!effectInstanceList.isEmpty()) {
-                            if(effectData.getMatch().match(block)) {
-                                Player player = event.getEntity();
-                                if(effectData.getMatch().match(block)) {
-                                    effectInstanceList.forEach(mobEffectInstance -> {
-                                        if(!player.hasEffect(mobEffectInstance.getEffect())) {
-                                            player.addEffect(mobEffectInstance);
-                                        }
-                                    });
-                                }
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    public void isOnBlock(TickEvent.PlayerTickEvent event) {
-        final List<EffectData> isOnBlockEffects = EffectAdapter.is_on_block_effects;
-        if(!isOnBlockEffects.isEmpty()) {
-            if(!event.isCanceled() && !event.player.isCreative()) {
-                if(!isOnBlockEffects.isEmpty()) {
-                    for(EffectData effectData: isOnBlockEffects) {
-                        List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
-                        if(!effectInstanceList.isEmpty()) {
-                            Player player = event.player;
-                            BlockPos pos = player.blockPosition();
-                            Block block = player.level.getBlockState(pos).getBlock();
+                for(EffectData effectData: blockBreakEffects) {
+                    List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
+                    if(!effectInstanceList.isEmpty()) {
+                        if(effectData.getMatch().match(block)) {
+                            Player player = event.getEntity();
                             if(effectData.getMatch().match(block)) {
                                 effectInstanceList.forEach(mobEffectInstance -> {
                                     if(!player.hasEffect(mobEffectInstance.getEffect())) {
@@ -99,14 +67,35 @@ public class BlockEvents {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
+    public void isOnBlock(TickEvent.PlayerTickEvent event) {
+        final List<EffectData> isOnBlockEffects = EffectAdapter.is_on_block_effects;
+        if(!isOnBlockEffects.isEmpty()) {
+            if(!event.isCanceled() && !event.player.isCreative()) {
+                for(EffectData effectData: isOnBlockEffects) {
+                    List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
+                    if(!effectInstanceList.isEmpty()) {
+                        Player player = event.player;
+                        BlockPos pos = player.blockPosition();
+                        Block block = player.level.getBlockState(pos).getBlock();
+                        if(effectData.getMatch().match(block)) {
+                            effectInstanceList.forEach(mobEffectInstance -> {
+                                if(!player.hasEffect(mobEffectInstance.getEffect())) {
+                                    player.addEffect(mobEffectInstance);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void blockPlace(BlockEvent.EntityPlaceEvent event) {
         final List<EffectData> blockPlaceEffects = EffectAdapter.block_place_effects;
         if(!blockPlaceEffects.isEmpty()) {
             if(!event.isCanceled() && event.getEntity() instanceof Player player) {
-                if(player.isCreative()) {
-                    return;
-                }
-                if(!blockPlaceEffects.isEmpty()) {
+                if(!player.isCreative()) {
                     for(EffectData effectData: blockPlaceEffects) {
                         List<MobEffectInstance> effectInstanceList = effectData.getEffectInstanceList();
                         if(!effectInstanceList.isEmpty()) {

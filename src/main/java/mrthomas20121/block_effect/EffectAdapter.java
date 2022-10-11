@@ -60,7 +60,7 @@ public class EffectAdapter extends SimpleJsonResourceReloadListener {
 
                 MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue(name);
                 if(effect != null) {
-                    effects.add(new MobEffectInstance(effect, duration, amplifier, false, hasParticle, true));
+                    effects.add(new MobEffectInstance(effect, duration, amplifier, false, hasParticle));
                 }
                 else {
                     BlockEffect.LOGGER.warn("Effect {} is invalid! please provide a valid name", name.toString());
