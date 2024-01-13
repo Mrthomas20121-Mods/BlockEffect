@@ -1,6 +1,7 @@
 package mrthomas20121.block_effect.data;
 
-import mrthomas20121.block_effect.data.block.Match;
+import mrthomas20121.block_effect.data.json.JsonEffect;
+import mrthomas20121.block_effect.data.match.Match;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -18,10 +19,7 @@ public class EffectData {
     }
 
     public List<MobEffectInstance> getEffectInstanceList() {
-        return jsonEffects.stream().map(jsonEffect -> {
-            MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue(jsonEffect.getPotionName());
-            return new MobEffectInstance(effect, jsonEffect.getDuration(), jsonEffect.getAmplifier(), false, jsonEffect.isVisible());
-        }).toList();
+        return jsonEffects.stream().map(JsonEffect::getValue).toList();
     }
 
     public Match getMatch() {

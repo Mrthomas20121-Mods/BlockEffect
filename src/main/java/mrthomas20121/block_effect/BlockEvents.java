@@ -1,11 +1,9 @@
 package mrthomas20121.block_effect;
 
 import mrthomas20121.block_effect.data.EffectData;
-import mrthomas20121.block_effect.data.Action;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.TickEvent;
@@ -15,7 +13,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.List;
-import java.util.Map;
 
 public class BlockEvents {
 

@@ -1,4 +1,4 @@
-package mrthomas20121.block_effect.data.block;
+package mrthomas20121.block_effect.data.match;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;

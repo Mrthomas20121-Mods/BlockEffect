@@ -1,0 +1,26 @@
+{
+    "type": "block_break",
+    "match": {
+        "type": "block",
+        "block": "minecraft:oak_planks"
+    },
+    "apply": [
+        {
+            "type": "effect",
+            "effect": {
+                "name": "minecraft:slowness",
+                "duration": 200,
+                "level": 0,
+                "showParticle": false
+            }
+        },
+        {
+            "type": "attribute",
+            "attribute": {
+                "name": "minecraft:attack_damage",
+                "type": "add",
+                "modifier": 0.2
+            }
+        }
+    ]
+}

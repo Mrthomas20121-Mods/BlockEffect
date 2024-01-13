@@ -1,17 +1,14 @@
 package mrthomas20121.block_effect;
 
 import com.google.gson.*;
-import mrthomas20121.block_effect.data.EffectData;
-import mrthomas20121.block_effect.data.Action;
-import mrthomas20121.block_effect.data.JsonEffect;
-import mrthomas20121.block_effect.data.block.Match;
+import mrthomas20121.block_effect.data.*;
+import mrthomas20121.block_effect.data.json.JsonEffect;
+import mrthomas20121.block_effect.data.match.Match;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
@@ -44,6 +41,7 @@ public class EffectAdapter extends SimpleJsonResourceReloadListener {
             boolean enabled = object.get("enabled").getAsBoolean();
             if(!enabled) {
                 BlockEffect.LOGGER.warn("Skipped {} because it's disabled.", loc.toString());
+                BlockEffect.EFFECT_LOG.warn("Skipped {} because it's disabled.", loc.toString());
                 return;
             }
 
@@ -62,8 +60,11 @@ public class EffectAdapter extends SimpleJsonResourceReloadListener {
                 if(ForgeRegistries.MOB_EFFECTS.containsKey(name)) {
                     effects.add(new JsonEffect(name, duration, amplifier, hasParticle));
                 }
+                else {
+                    BlockEffect.EFFECT_LOG.warn("Potion with %s name is null! please fix your BlockEffect file!".formatted(name));
+                }
             }
-            Match match = Action.BlockType.getMatchFromJson(object.getAsJsonObject("match"));
+            Match match = BlockType.getMatchFromJson(object.getAsJsonObject("match"));
             if(object.get("action").isJsonArray()) {
                 GsonHelper.getAsJsonArray(object, "action").forEach(element -> {
                     insert(loc.toString(), element.getAsString(), new EffectData(effects, match));
@@ -83,28 +84,30 @@ public class EffectAdapter extends SimpleJsonResourceReloadListener {
      */
     private void insert(String location, String action, EffectData effect) {
         if(!locations.contains(location)) {
-            // add the location to the list if the action is valid
-            checkAndAddLocation(location, action);
-            if(action.equals(Action.BLOCK_BREAK)) {
-                block_break_effects.add(effect);
-            }
-            else if(action.equals(Action.BLOCK_PLACE)) {
-                block_place_effects.add(effect);
-            }
-            else if(action.equals(Action.IS_ON_BLOCK)) {
-                is_on_block_effects.add(effect);
-            }
-            else if(action.equals(Action.BLOCK_RIGHT_CLICK)) {
-                block_right_click_effects.add(effect);
+            // add the location to the list if the action is valid and return true if the location was added.
+            boolean bool = locationActionCheck(location, action);
+            if(bool) {
+                BlockActionType blockActionType = BlockActionType.valueOf(action);
+
+                switch (blockActionType) {
+                    case BLOCK_BREAK -> block_break_effects.add(effect);
+                    case BLOCK_PLACE -> block_place_effects.add(effect);
+                    case ON_BLOCK -> is_on_block_effects.add(effect);
+                    case RIGHT_CLICK_BLOCK -> block_right_click_effects.add(effect);
+                }
             }
         }
     }
 
-    private void checkAndAddLocation(String location, String action) {
+    private boolean locationActionCheck(String location, String action) {
 
-        if(Action.actions.contains(action)) {
+        boolean bool = false;
+
+        if(BlockActionType.values.contains(action)) {
             locations.add(location);
+            bool = true;
         }
-        else throw new JsonSyntaxException("Not a valid action!");
+
+        return bool;
     }
 }
